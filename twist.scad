@@ -1,12 +1,12 @@
 $fn=256;
-height=100;
+height=150;
 tolerance=.75;
 size=70;
-roundness=25;
-twist=90;
+roundness=20;
+twist=-360;
 chamfer_thickness=.5;
-chamfer_slope=1.5;
-sides=5;
+chamfer_width=.5;
+sides=2;
 base_thickness=3;
 base_width=2;
 base_slope=base_width/base_thickness;
@@ -25,23 +25,17 @@ module handle() {
     linear_extrude(base_thickness/2,scale=(size+base_slope*base_thickness)/size)base();
 
 }
-module chamfer_cutter() {
-translate([0,0,height])
-rotate([180,0,0])
-difference() {
-translate([0,0,-1])linear_extrude(height)square(size*1.5,center=true);
-rotate([0,0,twist])
-linear_extrude(slices=$fn,height,twist=twist,scale=(size-chamfer_thickness+1/chamfer_slope*height)/(size-chamfer_thickness))
-offset(-chamfer_thickness)base();
+module chamfer() {
+translate([0,0,height-chamfer_thickness])
+linear_extrude(chamfer_thickness,scale=(size-chamfer_width)/size)
+base();
 }
-}
+
 module inside() {
     union() {
         handle();
-        difference() {
-            linear_extrude(height,slices=$fn,twist=twist)base();
-            chamfer_cutter();
-        }
+            linear_extrude(height-chamfer_thickness,slices=$fn,twist=twist)base();
+            chamfer();
     }
 }
 module outside() {
